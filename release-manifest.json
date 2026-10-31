@@ -1,0 +1,23 @@
+{
+  "version": "0.3.0-bm25",
+  "files": {
+    ".env.example": "39b93634df5d250e684f1c0d50f417f8cf98325e468c271de1c2fb838e3aa16c",
+    ".gitignore": "e5406e2ebc36f6a4fb5fb90b0b7becca55bdd81762a763a32fd8e7dcdd693a14",
+    ".python-version": "3a55324cbeddc91df012407d051dad08c88624c95a82fbdb856728729fbd14ab",
+    "README.md": "6480eff388188438be6805c37c8e4d894502140cd9c6d97d536a34f71bad24c2",
+    "METHOD.md": "76b917d0343f9a3e7a9fa5827adc3ae51a1b0f6c12e017a3d8f9571d8a844bce",
+    "LICENSE": "c589273515fb5df481a6c089911f90646563fc7b630cffda495002355e0d379b",
+    "requirements.txt": "46f003e697af2e5d2f07651de45bccc7af80625ca3783293e1eefb32328cc196",
+    "competition_app_secure.py": "a45c1844a9d64838207e612388ec3d9d4f9f57feff0c8c91560bf3699e2a0091",
+    "lexical_memory.py": "573ee092526c523ab476d1ff5adff1e6660a5c857f6c19c97ae5462e1b2b1eb7",
+    "setup_local_key.py": "b1a465568e2796bd8b3367447c8c809af8f0cf4ae0d0ab6d43286aa6d26805e5",
+    "check_server.py": "0d3d15a3dbe1d8a571a80c0169753c7e7f953dc3c3ef3f9208e849da36afd32b",
+    "chronomem.service": "4bc2259f42b871213c16d4af9033fe69e29b9aacb09c39a8f65eaaa53a1695de",
+    "install_server.py": "82e32d7d0579900a406d37793064d08b3deeeb2423b23f3a0b54149298919a02",
+    "configure_https.py": "b87f39b0642721e8213f7b1d49c1af95d382fac676c9349368f16816a9e22f20",
+    "upgrade_bm25.py": "a6f1e2c6f7de67777f1c3b3c3999e9095d43e45591500296eb842478701c36db",
+    "SERVER_INSTALL.md": "2d94087b28c9aeba6fc4cfd42adbbd7f7997432517323e98c06907b2d3066312",
+    "render.yaml": "aabde47ccf29f9bbbc30e0d37c0fb50f58b1430f6ceb964dce0c0e8167794c37",
+    "DEPLOY_RENDER.md": "9dd3aaf6ecbecaa56931a18889c3302d6909d1d1813ac75ee62353c567550aaa"
+  }
+}

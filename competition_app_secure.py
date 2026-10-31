@@ -1,4 +1,4 @@
-"""Text-only keyword baseline with local and hosted storage configuration.
+"""Text-only BM25 baseline with local and hosted storage configuration.
 
 Run setup_local_key.py first, then:
 python -m uvicorn competition_app_secure:app --host 127.0.0.1 --port 8000
@@ -19,6 +19,7 @@ from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, Field, StringConstraints
+from lexical_memory import index_message, initialize_index, search
 
 
 load_dotenv(Path(__file__).with_name(".env"), override=False)
@@ -26,8 +27,8 @@ API_KEY = os.environ.get("CHRONOMEM_API_KEY", "")
 if not API_KEY.strip():
     raise RuntimeError("CHRONOMEM_API_KEY is missing. Run setup_local_key.py first.")
 
-VERSION = os.environ.get("CHRONOMEM_VERSION", "0.2.0-keyword")
-app = FastAPI(title="ChronoMem - Text Keyword Baseline (API Key)", version=VERSION)
+VERSION = os.environ.get("CHRONOMEM_VERSION", "0.3.0-bm25")
+app = FastAPI(title="ChronoMem - Text BM25 Baseline (API Key)", version=VERSION)
 DB_PATH = Path(os.environ.get("CHRONOMEM_DB_PATH", "chronomem_contract.db"))
 if not DB_PATH.is_absolute():
     DB_PATH = Path(__file__).resolve().parent / DB_PATH
@@ -68,6 +69,7 @@ with closing(connect()) as conn:
         CREATE INDEX IF NOT EXISTS messages_by_user ON messages(user_id);
     """)
     conn.commit()
+    initialize_index(conn)
 
 
 class Message(BaseModel):
@@ -115,16 +117,15 @@ def add_memory(item: AddInput):
                     detail="request_id was already used with a different payload",
                 )
             if previous is None:
-                conn.executemany(
-                    "INSERT INTO messages "
-                    "(user_id, session_id, request_id, position, role, content, source_timestamp) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    [
+                for index, message in enumerate(item.messages):
+                    message_id = conn.execute(
+                        "INSERT INTO messages "
+                        "(user_id, session_id, request_id, position, role, content, source_timestamp) "
+                        "VALUES (?, ?, ?, ?, ?, ?, ?)",
                         (item.user_id, item.session_id, item.request_id, index,
-                         message.role, message.content, message.timestamp)
-                        for index, message in enumerate(item.messages)
-                    ],
-                )
+                         message.role, message.content, message.timestamp),
+                    ).lastrowid
+                    index_message(conn, message_id, item.user_id, message.role, message.content, message.timestamp)
                 conn.execute(
                     "INSERT INTO writes VALUES (?, ?, ?)",
                     (item.user_id, item.request_id, digest),
@@ -139,18 +140,6 @@ def add_memory(item: AddInput):
 
 @app.post("/search", dependencies=[Depends(require_api_key)])
 def search_memories(item: SearchInput):
-    # This lesson uses literal phrase matching, not semantic retrieval.
-    keyword = item.query.strip().casefold()
-    data = []
     with closing(connect()) as conn:
-        rows = conn.execute(
-            "SELECT id, content FROM messages WHERE user_id=? ORDER BY id",
-            (item.user_id,),
-        )
-        for memory_id, content in rows:
-            if keyword in content.casefold():
-                data.append({"id": f"mem_{memory_id}", "content": content})
-                if len(data) >= item.top_k:
-                    break
-    # All phrase matches tie in this baseline; insertion order breaks ties.
+        data = search(conn, item.user_id, item.query, item.top_k)
     return {"data": data}

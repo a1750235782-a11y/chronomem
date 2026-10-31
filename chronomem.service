@@ -1,0 +1,27 @@
+[Unit]
+Description=ChronoMem Text Memory API
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=admin
+Group=admin
+WorkingDirectory=/home/admin/chronomem
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+Environment=CHRONOMEM_DB_PATH=/home/admin/chronomem/data/chronomem_contract.db
+Environment=CHRONOMEM_VERSION=0.3.0-bm25
+ExecStart=/home/admin/chronomem/.venv/bin/python -m uvicorn competition_app_secure:app --host 127.0.0.1 --port 8000 --workers 1 --no-access-log
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=1900
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/admin/chronomem/data
+
+[Install]
+WantedBy=multi-user.target
