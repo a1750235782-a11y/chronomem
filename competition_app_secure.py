@@ -1,8 +1,9 @@
-"""Local text-only contract exercise, not a production competition service.
+"""Text-only keyword baseline with local and hosted storage configuration.
 
 Run setup_local_key.py first, then:
 python -m uvicorn competition_app_secure:app --host 127.0.0.1 --port 8000
-The SQLite and .env files live next to this file. No cloud services are used.
+CHRONOMEM_DB_PATH can point to a persistent disk on a hosting service.
+This baseline has not passed official Smoke or Full evaluation.
 """
 
 from contextlib import closing
@@ -25,8 +26,12 @@ API_KEY = os.environ.get("CHRONOMEM_API_KEY", "")
 if not API_KEY.strip():
     raise RuntimeError("CHRONOMEM_API_KEY is missing. Run setup_local_key.py first.")
 
-app = FastAPI(title="ChronoMem - Local Text Contract Practice (API Key)")
-DB_PATH = Path(__file__).with_name("chronomem_contract.db")
+VERSION = os.environ.get("CHRONOMEM_VERSION", "0.2.0-keyword")
+app = FastAPI(title="ChronoMem - Text Keyword Baseline (API Key)", version=VERSION)
+DB_PATH = Path(os.environ.get("CHRONOMEM_DB_PATH", "chronomem_contract.db"))
+if not DB_PATH.is_absolute():
+    DB_PATH = Path(__file__).resolve().parent / DB_PATH
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 NonBlank = Annotated[str, StringConstraints(pattern=r"\S")]
 key_header = APIKeyHeader(name="X-Api-Key", auto_error=False)
 
@@ -89,7 +94,7 @@ class SearchInput(BaseModel):
 def health():
     with closing(connect()) as conn:
         conn.execute("SELECT 1").fetchone()
-    return {"status": "ok", "mode": "local text contract practice"}
+    return {"status": "ok", "version": VERSION, "storage": "sqlite"}
 
 
 @app.post("/add", status_code=200, dependencies=[Depends(require_api_key)])

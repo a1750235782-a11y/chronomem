@@ -1,0 +1,24 @@
+# One small paid service for initial integration checks, not a Full-capacity claim.
+services:
+  - type: web
+    name: chronomem-api
+    runtime: python
+    region: singapore
+    branch: main
+    plan: 0.5c-512mb
+    numInstances: 1
+    autoDeployTrigger: 'off'
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m uvicorn competition_app_secure:app --host 0.0.0.0 --port $PORT --workers 1 --no-access-log
+    healthCheckPath: /health
+    envVars:
+      - key: CHRONOMEM_API_KEY
+        generateValue: true
+      - key: CHRONOMEM_DB_PATH
+        value: /var/data/chronomem_contract.db
+      - key: CHRONOMEM_VERSION
+        value: 0.2.0-keyword
+    disk:
+      name: chronomem-data
+      mountPath: /var/data
+      sizeGB: 5

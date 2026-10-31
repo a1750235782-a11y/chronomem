@@ -1,6 +1,6 @@
-# ChronoMem 本地文本记忆原型
+# ChronoMem 文本记忆基线
 
-这是一个在 Codex 辅助下编写的入门教学项目，用于学习 FastAPI、SQLite，以及 Agent Memory Leaderboard 的文本 Add/Search 请求格式。当前搜索使用字符串包含匹配；尚未进行官方 Smoke 或 Full 评测，也没有竞赛成绩或新算法声明。
+这是一个在 Codex 辅助下编写的入门教学项目，用于学习 FastAPI、SQLite，以及 Agent Memory Leaderboard 的文本 Add/Search 请求格式。当前搜索使用字符串包含匹配；仓库提供 Render 部署配置，但尚未进行官方 Smoke 或 Full 评测，也没有竞赛成绩或新算法声明。
 
 ## 已完成的功能
 
@@ -30,7 +30,13 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m uvicorn competition_app_secure:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-打开 `http://127.0.0.1:8000/docs`。服务的配置和数据库均从程序文件所在目录读取；默认数据库名为 `chronomem_contract.db`。
+打开 `http://127.0.0.1:8000/docs`。服务从程序文件所在目录读取 `.env`；默认数据库名为 `chronomem_contract.db`。可以通过 `CHRONOMEM_DB_PATH` 设置持久盘上的数据库路径。
+
+## Render 公网接入准备
+
+仓库中的 `render.yaml` 配置了单个付费实例、5GB 持久盘、公开健康检查，以及自动生成的接口密钥。具体创建步骤、费用组成和接入验证见 [DEPLOY_RENDER.md](DEPLOY_RENDER.md)。
+
+该配置是接入起点，正式 Full 前还需验证检索效果和容量。自动部署已关闭；评测期间需固定代码与配置版本。
 
 ## 密钥配置
 
